@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  app:
+    build: BUILD
+    image: links
+    container_name: links
+    restart: always
+    volumes: 
+        - ./volumes/app:/opt/links
+
+  rp:
+    image: nginx:alpine
+    container_name: links-rp
+    restart: always
+    ports:
+      - "80:80"
+      #- "443:443"
+    volumes:
+      - ./volumes/rp/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
+      #- ./volumes/rp/ssl/links.cobblepot59.int.crt:/etc/ssl/certs/links.cobblepot59.int.crt:ro
+      #- ./volumes/rp/ssl/links.cobblepot59.int.key:/etc/ssl/private/links.cobblepot59.int.key:ro
+    environment:
+      - NGINX_HOST=links.cobblepot59.int

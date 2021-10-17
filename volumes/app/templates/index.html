@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block headers %} <link rel="stylesheet" href="static/css/index.css"> {% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col md-12">
+            <div class="jumbotron p-3">
+                <a href="/logout" style="float: right">logout</a>
+                <h2>Manage <b>Links</b>
+                  <button type="button" class="btn btn-secondary float-right" data-bs-toggle="modal" data-bs-target="#mymodal">Add Link</button>
+                </h2>
+  
+                <table id="data" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Urls</th>
+                            <th>Tags</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for link in links %}
+                    {% if link.archive %}
+                    <tr>
+                        <td><del>{{link.url}}</del></td>
+                        <td>
+                        {% for tag in link.tags %}
+                          <a href="">#{{tag.name}}</a>
+                        {% endfor %}
+                        </td>
+                        <td>
+                            <a href="/like/{{link.id}}" style="pointer-events: none"><i class="bi bi-hand-thumbs-up"></i></a>
+                            <a href="/dislike/{{link.id}}" style="pointer-events: none"><i class="bi bi-hand-thumbs-down"></i></a>
+                            <a href="/restore/{{link.id}}"><i class="bi bi-recycle"></i></a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td><a href="{{link.url}}">{{link.url}}</a></td>
+                        <td>
+                        {% for tag in link.tags %}
+                          <a href="">#{{tag.name}}</a>
+                        {% endfor %}
+                        </td>
+                        <td>
+                            {% set nb_like = namespace(value=0) %}
+                            {% set lovers = namespace(entities=[]) %}
+                            {% for like in link.likes %}
+                                {% set nb_like.value = nb_like.value + 1 %}
+                                {% set lovers.entities = lovers.entities + [like.login] %}
+                            {% endfor %}
+                            <a href="/like/{{link.id}}" data-toggle="tooltip" data-placement="top" title="{{lovers.entities}}"><i class="bi bi-hand-thumbs-up"></i>{{nb_like.value}}</a>
+                            {% set nb_dislike = namespace(value=0) %}
+                            {% set haters = namespace(entities=[]) %}
+                            {% for dislike in link.dislikes %}
+                                {% set nb_dislike.value = nb_dislike.value + 1 %}
+                                {% set haters.entities = haters.entities + [dislike.login] %}
+                            {% endfor %}
+                            <a href="/dislike/{{link.id}}" data-toggle="tooltip" data-placement="top" title="{{haters.entities}}"><i class="bi bi-hand-thumbs-down"></i>{{nb_dislike.value}}</a>
+                            <a href="/archive/{{link.id}}"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                   {% endif %}
+                   {% endfor %}
+                   </tbody>
+                </table>
+            </div>
+            <div id="mymodal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header"><h4 class="modal-title">Add Link</h4></div>
+                        <div class="modal-body">
+                            <form action="{{url_for('add')}}" method="POST">
+                                <div class="form-group">
+                                    <label>Url:</label>
+                                    <input type="text" class="form-control" name="url" required="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>Tags:</label>
+                                    <input type="text" class="form-control" name="tags" placeholder="Enter tags separated by coma" required="1">
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-secondary" type="submit">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    $(document).ready(function () {
+      $('#data').DataTable({
+        columns: [
+          {orderable: false, searchable: false},
+          {orderable: false, searchable: true},
+          {orderable: false, searchable: false},
+          ],
+      });
+    });
+    
+    $(document).ready(function(){
+      $('[data-toggle="tooltip"]').tooltip();   
+    });
+  </script>
+{% endblock %}
