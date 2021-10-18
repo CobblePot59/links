@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, flash, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import IntegrityError
 from flask_simpleldap import LDAP
 from datetime import timedelta
 import validators
@@ -68,10 +69,14 @@ def add():
             flash('A valid URL is required!', 'danger')
             return redirect(url_for('index'))
         
-        new_link = Link(url = url)
-        db.session.add(new_link)
-        db.session.commit()
-
+        try:
+            new_link = Link(url = url)
+            db.session.add(new_link)
+            db.session.commit()
+        except IntegrityError:
+            flash('URL already registred', 'danger')
+            return redirect(url_for('index'))
+            
         str_tags = request.form['tags']
         q = Link.query.filter_by(url=url).first()
         for name in str_tags.split(','):
