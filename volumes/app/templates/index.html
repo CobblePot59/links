@@ -100,11 +100,11 @@
 {% block scripts %}
   <script>
     $(document).ready(function () {
-      $('#data').DataTable({
+      $("#data").DataTable({
         columns: [
-          {orderable: false, searchable: false},
-          {orderable: false, searchable: true},
-          {orderable: false, searchable: false},
+          {orderable: false, searchable: false, "width": "60%"},
+          {orderable: false, searchable: true, "width": "30%"},
+          {orderable: false, searchable: false, "width": "10%"},
           ],
       });
     });
