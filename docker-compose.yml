@@ -33,5 +33,5 @@ services:
       - LDAP_USERS=user01,user02
       - LDAP_PASSWORDS=password1,password2
     volumes:
-      - './volumes/:/bitnami/openldap'
+      - './volumes/openldap:/bitnami/openldap'
 
