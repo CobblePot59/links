@@ -28,10 +28,10 @@ services:
       - '1389:1389'
       - '1636:1636'
     environment:
+      - LDAP_ROOT="dc=links,dc=int"
+      - LDAP_DOMAIN="links.int"
       - LDAP_ADMIN_USERNAME=admin
       - LDAP_ADMIN_PASSWORD=adminpassword
       - LDAP_USERS=user01,user02
       - LDAP_PASSWORDS=password1,password2
-    volumes:
-      - './volumes/openldap:/bitnami/openldap'
 

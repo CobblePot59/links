@@ -4,27 +4,28 @@ from sqlalchemy.exc import IntegrityError
 from flask_simpleldap import LDAP
 from datetime import timedelta
 import validators
-
+import sys
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/links.db'
-app.config['SECRET_KEY'] = '0Og1OIeIIl5oj0pl96oy26Oc0O113l024bh9qI9cq47e291t78qsI9wmoIn9I057'
+app.config['SECRET_KEY'] = 'xy7gof9O0a7a0I3004ro70bwOlc40slkIlict16oO2rk1go2z04tOynf2lp73oOa'
 app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=15)
 
-app.config['LDAP_SCHEMA'] = 'ldaps'
-app.config['LDAP_HOST'] = ''
-app.config['LDAP_PORT'] = '636'
-app.config['LDAP_USE_SSL'] = True
-app.config['LDAP_BASE_DN'] = 'OU=Domain Users,DC=cobblepot59,DC=int'
-app.config['LDAP_USERNAME'] = ''
-app.config['LDAP_PASSWORD'] = ''
+app.config['LDAP_OPENLDAP'] = True
+app.config['LDAP_SCHEMA'] = 'ldap'
+app.config['LDAP_HOST'] = '192.168.0.4'
+app.config['LDAP_PORT'] = '1389'
+app.config['LDAP_USE_SSL'] = False
+app.config['LDAP_BASE_DN'] = 'ou=users,dc=links,dc=int'
+app.config['LDAP_USERNAME'] = 'cn=admin,dc=links,dc=int'
+app.config['LDAP_PASSWORD'] = 'adminpassword'
+app.config['LDAP_USER_OBJECT_FILTER'] = "(&(objectclass=inetOrgPerson)(uid=%s))"
 
 db = SQLAlchemy(app)
 ldap = LDAP(app)
 from models import *
-
 
 @app.route('/', methods=('GET', 'POST'))
 def index():
@@ -42,15 +43,15 @@ def login():
         if request.method == 'GET':
             return render_template('login.html')
         else:
-            login = request.form['login']+'@cobblepot59.int' # CHANGE ME
-            password = request.form['password']
+            login = str(request.form['login'])
+            password = str(request.form['password'])
             q = ldap.bind_user(login, password)
             if password and q == True:
                 session['status'] = True
                 session['login'] = login.split('@')[0]
                 return redirect(url_for('index'))
             else:
-                return 'Bad Login'
+                return 'Bad Login '
 
 @app.route('/logout', methods=['GET'])
 def logout():
@@ -68,7 +69,7 @@ def add():
         if not validators.url(url):
             flash('A valid URL is required!', 'danger')
             return redirect(url_for('index'))
-        
+
         try:
             new_link = Link(url = url)
             db.session.add(new_link)
@@ -76,7 +77,7 @@ def add():
         except IntegrityError:
             flash('URL already registred', 'danger')
             return redirect(url_for('index'))
-            
+
         str_tags = request.form['tags']
         q = Link.query.filter_by(url=url).first()
         for name in str_tags.split(','):
@@ -97,11 +98,11 @@ def like(id):
             new_like = Like(login=login, link_id=id)
             db.session.add(new_like)
             db.session.commit()
-            return redirect(url_for('index'))
+            return ('', 204) #redirect(url_for('index'))
         elif login in q.login:
             Like.query.filter_by(link_id=id, login=login).delete()
             db.session.commit()
-            return redirect(url_for('index'))
+            return ('', 204) #redirect(url_for('index'))
     else:
         return redirect(url_for('login'))
 
@@ -114,11 +115,25 @@ def dislike(id):
             new_dislike = Dislike(login=login, link_id=id)
             db.session.add(new_dislike)
             db.session.commit()
-            return redirect(url_for('index'))
+            return ('', 204) #redirect(url_for('index'))
         elif login in q.login:
             Dislike.query.filter_by(link_id=id, login=login).delete()
             db.session.commit()
-            return redirect(url_for('index'))
+            return ('', 204) #redirect(url_for('index'))
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/edit/<id>', methods=('GET', 'POST'))
+def edit(id):
+    if session.get('status'):
+        str_tags = request.form['tags']
+        Tag.query.filter_by(link_id=id).delete()
+        for name in str_tags.split(','):
+            new_tag = Tag(name = name.strip().lower(), link_id = id)
+            db.session.add(new_tag)
+            db.session.commit()
+        flash('Link has been modified', 'success')
+        return redirect(url_for('index'))
     else:
         return redirect(url_for('login'))
 
@@ -128,7 +143,7 @@ def archive(id):
         q = Link.query.filter_by(id=id).first()
         q.archive = True
         db.session.commit()
-        flash('Link has been archived', 'danger')
+        flash('Link has been archived', 'success')
         return redirect(url_for('index'))
     else:
         return redirect(url_for('login'))
@@ -140,6 +155,16 @@ def restore(id):
         q.archive = False
         db.session.commit()
         flash('Link has been restored', 'success')
+        return redirect(url_for('index'))
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/delete/<id>', methods=('GET', 'POST'))
+def delete(id):
+    if session.get('status'):
+        Link.query.filter_by(id=id).delete()
+        db.session.commit()
+        flash('Link has been deleted', 'danger')
         return redirect(url_for('index'))
     else:
         return redirect(url_for('login'))
