@@ -15,7 +15,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=15)
 
 app.config['LDAP_OPENLDAP'] = True
 app.config['LDAP_SCHEMA'] = 'ldap'
-app.config['LDAP_HOST'] = '192.168.0.4'
+app.config['LDAP_HOST'] = 'openldap'
 app.config['LDAP_PORT'] = '1389'
 app.config['LDAP_USE_SSL'] = False
 app.config['LDAP_BASE_DN'] = 'ou=users,dc=links,dc=int'
@@ -51,6 +51,7 @@ def login():
                 session['login'] = login.split('@')[0]
                 return redirect(url_for('index'))
             else:
+
                 return 'Bad Login '
 
 @app.route('/logout', methods=['GET'])
@@ -98,11 +99,11 @@ def like(id):
             new_like = Like(login=login, link_id=id)
             db.session.add(new_like)
             db.session.commit()
-            return ('', 204) #redirect(url_for('index'))
+            return ( str(len(Link.query.filter_by(id=id).first().likes)), 200)
         elif login in q.login:
             Like.query.filter_by(link_id=id, login=login).delete()
             db.session.commit()
-            return ('', 204) #redirect(url_for('index'))
+            return (str(len(Link.query.filter_by(id=id).first().likes)), 200) 
     else:
         return redirect(url_for('login'))
 
@@ -115,11 +116,11 @@ def dislike(id):
             new_dislike = Dislike(login=login, link_id=id)
             db.session.add(new_dislike)
             db.session.commit()
-            return ('', 204) #redirect(url_for('index'))
+            return (str(len(Link.query.filter_by(id=id).first().dislikes)), 200) #redirect(url_for('index'))
         elif login in q.login:
             Dislike.query.filter_by(link_id=id, login=login).delete()
             db.session.commit()
-            return ('', 204) #redirect(url_for('index'))
+            return (str(len(Link.query.filter_by(id=id).first().dislikes)), 200) #redirect(url_for('index'))
     else:
         return redirect(url_for('login'))
 
