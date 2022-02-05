@@ -99,11 +99,11 @@ def like(id):
             new_like = Like(login=login, link_id=id)
             db.session.add(new_like)
             db.session.commit()
-            return ( str(len(Link.query.filter_by(id=id).first().likes)), 200)
         elif login in q.login:
             Like.query.filter_by(link_id=id, login=login).delete()
             db.session.commit()
-            return (str(len(Link.query.filter_by(id=id).first().likes)), 200) 
+        res = {"nb": len(Link.query.filter_by(id=id).first().likes), "users": [ x[0] for x in Like.query.with_entities(Like.login).filter_by(link_id=id).all()] }
+        return Response( dumps(res), mimetype='application/json', status=200 )    
     else:
         return redirect(url_for('login'))
 
@@ -116,11 +116,12 @@ def dislike(id):
             new_dislike = Dislike(login=login, link_id=id)
             db.session.add(new_dislike)
             db.session.commit()
-            return (str(len(Link.query.filter_by(id=id).first().dislikes)), 200) #redirect(url_for('index'))
         elif login in q.login:
             Dislike.query.filter_by(link_id=id, login=login).delete()
             db.session.commit()
-            return (str(len(Link.query.filter_by(id=id).first().dislikes)), 200) #redirect(url_for('index'))
+        
+        res = {"nb": len(Link.query.filter_by(id=id).first().dislikes), "users": [ x[0] for x in Dislike.query.with_entities(Dislike.login).filter_by(link_id=id).all()] }
+        return Response( dumps(res), mimetype='application/json', status=200 )    
     else:
         return redirect(url_for('login'))
 
@@ -141,25 +142,18 @@ def edit(id):
 @app.route('/archive/<id>')
 def archive(id):
     if session.get('status'):
-        q = Link.query.filter_by(id=id).first()
-        q.archive = True
+        item = Link.query.filter_by(id=id).first()
+        if item.archive:
+            item.archive = False
+            res = {"restore": True}
+        else:
+            item.archive = True
+            res = {"archive": True}
         db.session.commit()
-        flash('Link has been archived', 'success')
-        return redirect(url_for('index'))
+        return (dumps(res), 200)
     else:
         return redirect(url_for('login'))
-
-@app.route('/restore/<id>')
-def restore(id):
-    if session.get('status'):
-        q = Link.query.filter_by(id=id).first()
-        q.archive = False
-        db.session.commit()
-        flash('Link has been restored', 'success')
-        return redirect(url_for('index'))
-    else:
-        return redirect(url_for('login'))
-
+        
 @app.route('/delete/<id>', methods=('GET', 'POST'))
 def delete(id):
     if session.get('status'):

@@ -24,48 +24,45 @@
                     {% for link in links %}
                     {% if link.archive %}
                     <tr>
-                        <td><del>{{link.url}}</del></td>
+                        <td><div id="link-{{link.id}}"><del>{{link.url}}</del></div></td>
                         <td>
                         {% for tag in link.tags %}
                           <a href="">#{{tag.name}}</a>
                         {% endfor %}
                         </td>
                         <td>
-                            <a href="/like/{{link.id}}" style="pointer-events: none"><i class="bi bi-hand-thumbs-up"></i></a>
-                            <a href="/dislike/{{link.id}}" style="pointer-events: none"><i class="bi bi-hand-thumbs-down"></i></a>
-                            <a href="#edit" data-bs-toggle="modal" data-link-id="{{link.id}}" data-link-url="{{link.url}}" style="pointer-events: none"><i class="bi bi-pencil-square"></i></a>
-                            <a href="/restore/{{link.id}}"><i class="bi bi-recycle"></i></a>
-                            <a href="#delete" data-bs-toggle="modal" data-link-id="{{link.id}}" data-link-url="{{link.url}}"><i class="bi bi-trash"></i></a>
-                        </td>
+                          <a id="like-{{link.id}}"><i class="bi bi-hand-thumbs-up" style="color:green;cursor: pointer"></i></a>
+                          <a id="dislike-{{link.id}}"><i class="bi bi-hand-thumbs-down" style="color:red"></i></a>
+                          <a href="#edit" data-bs-toggle="modal" data-link-id="{{link.id}}" data-link-url="{{link.url}}"><i class="bi bi-pencil-square"></i></a>
+                          <a id="archive-{{link.id}}" onclick="archive(this)"><i class="bi bi-recycle" style="color:seagreen;cursor:pointer"></i></a>
+                          <a href="#delete" data-bs-toggle="modal" data-link-id="{{link.id}}" data-link-url="{{link.url}}"><i class="bi bi-trash"></i></a></td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td><a href="{{link.url}}">{{link.url}}</a></td>
+                        <td><div id="link-{{link.id}}"><a href="{{link.url}}">{{link.url}}</a></div></td>
                         <td>
                         {% for tag in link.tags %}
                           <a href="">#{{tag.name}}</a>
                         {% endfor %}
                         </td>
                         <td>
-                          <div class="row-md-5">
                             {% set nb_like = namespace(value=0) %}
                             {% set lovers = namespace(entities=[]) %}
                             {% for like in link.likes %}
                                 {% set nb_like.value = nb_like.value + 1 %}
                                 {% set lovers.entities = lovers.entities + [like.login] %}
                             {% endfor %}
-                            <div class="col-sm" id="like-{{link.id}}" onclick="like(this)" data-toggle="tooltip" data-placement="top" title="{{lovers.entities}}"><i class="bi bi-hand-thumbs-up" style="color:green"></i>{{nb_like.value}}</div>
+                            <a id="like-{{link.id}}" onclick="like(this)" data-toggle="tooltip" data-placement="top" title="{{lovers.entities}}"><i class="bi bi-hand-thumbs-up" style="color:green;cursor: pointer"></i>{{nb_like.value}}</a>
                             {% set nb_dislike = namespace(value=0) %}
                             {% set haters = namespace(entities=[]) %}
                             {% for dislike in link.dislikes %}
                                 {% set nb_dislike.value = nb_dislike.value + 1 %}
                                 {% set haters.entities = haters.entities + [dislike.login] %}
                             {% endfor %}
-                            <div class="col-sm"  id="dislike-{{link.id}}" onclick="dislike(this)" data-toggle="tooltip" data-placement="top" title="{{haters.entities}}"><i class="bi bi-hand-thumbs-down" style="color:red"></i>{{nb_dislike.value}}</div>
+                            <a id="dislike-{{link.id}}" onclick="dislike(this)" data-toggle="tooltip" data-placement="top" title="{{haters.entities}}"><i class="bi bi-hand-thumbs-down" style="color:red"></i>{{nb_dislike.value}}</a>
                             <a href="#edit" data-bs-toggle="modal" data-link-id="{{link.id}}" data-link-url="{{link.url}}"><i class="bi bi-pencil-square"></i></a>
-                            <a href="/archive/{{link.id}}"><i class="bi bi-recycle"></i></a>
+                            <a id="archive-{{link.id}}" onclick="archive(this)"><i class="bi bi-recycle" style="color:seagreen;cursor:pointer"></i></a>
                             <a href="#delete" data-bs-toggle="modal" data-link-id="{{link.id}}" data-link-url="{{link.url}}"><i class="bi bi-trash"></i></a>
-                          </div>
                         </td>
                     </tr>
                     {% endif %}
@@ -90,11 +87,14 @@
         {orderable: false, searchable: true, "width": "25%"},
         {orderable: false, searchable: false, "width": "15%"},
         ],
+      drawCallback: settings => {
+        $('[data-toggle="tooltip"]').tooltip();
+      }
     });
   });
     
   $(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip();   
+    $('[data-toggle="tooltip"]').tooltip();
   });
 
   $('#edit').on('show.bs.modal', function(e) {
@@ -116,15 +116,31 @@
   function like(likeObject){
     let id = likeObject.id.split('-')[1];
     $.get('/like/'+id, (data) => {
-      likeObject.innerHTML = '<i class="bi bi-hand-thumbs-up"></i>' + data;
-    });
+      likeObject.lastChild.data = data.nb;
+      $("#like-"+id).attr("data-bs-original-title", data.users);
+    }, 'json');
   } 
   
   function dislike(dislikeObject){
     let id = dislikeObject.id.split('-')[1];
     $.get('/dislike/'+id, (data) => {
-      dislikeObject.innerHTML = '<i class="bi bi-hand-thumbs-up"></i>' + data;
+      dislikeObject.lastChild.data = data;
+      $("#dislike-"+id).attr("data-bs-original-title", data.users);
     });
+  }
+
+  function archive(archiveObject){
+    let id = archiveObject.id.split('-')[1];
+    $.get('/archive/'+ id, (data, status, xhr) => {
+      if( xhr.status === 200){
+        if( data.archive != null && data.archive)
+          $("#link-"+id)[0].innerHTML = "<del>"+ $("#link-"+id)[0].lastChild.href + "</del>";
+        else if(data.restore != null && data.restore) {
+          lc = $("#link-"+id)[0].lastChild.lastChild.data
+          $("#link-"+id)[0].innerHTML = "<a href="+ lc +">"+ lc + "</a>"
+        }
+      }
+    }, 'json');
   }
 </script>
 {% endblock %}
