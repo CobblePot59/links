@@ -10,18 +10,18 @@ app = Flask(__name__)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/links.db'
-app.config['SECRET_KEY'] = 'xy7gof9O0a7a0I3004ro70bwOlc40slkIlict16oO2rk1go2z04tOynf2lp73oOa'
+app.config['SECRET_KEY'] = config['SECRET_KEY']
 app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=15)
 
-app.config['LDAP_OPENLDAP'] = True
-app.config['LDAP_SCHEMA'] = 'ldap'
-app.config['LDAP_HOST'] = 'openldap'
-app.config['LDAP_PORT'] = '1389'
-app.config['LDAP_USE_SSL'] = False
-app.config['LDAP_BASE_DN'] = 'ou=users,dc=links,dc=int'
-app.config['LDAP_USERNAME'] = 'cn=admin,dc=links,dc=int'
-app.config['LDAP_PASSWORD'] = 'adminpassword'
-app.config['LDAP_USER_OBJECT_FILTER'] = "(&(objectclass=inetOrgPerson)(uid=%s))"
+app.config['LDAP_OPENLDAP'] = config['LDAP_OPENLDAP']
+app.config['LDAP_SCHEMA'] = config['LDAP_SCHEMA']
+app.config['LDAP_HOST'] = config['LDAP_HOST']
+app.config['LDAP_PORT'] = config['LDAP_PORT']
+app.config['LDAP_USE_SSL'] = config['LDAP_USE_SSL']
+app.config['LDAP_BASE_DN'] = config['LDAP_BASE_DN']
+app.config['LDAP_USERNAME'] = config['LDAP_USERNAME']
+app.config['LDAP_PASSWORD'] = config['LDAP_PASSWORD']
+app.config['LDAP_USER_OBJECT_FILTER'] = config['LDAP_USER_OBJECT_FILTER']
 
 db = SQLAlchemy(app)
 ldap = LDAP(app)
