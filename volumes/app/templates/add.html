@@ -1,0 +1,28 @@
+<div id="add" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h4 class="modal-title">Add Link</h4></div>
+        <div class="modal-body">
+          <form action="{{url_for('add')}}" method="POST">
+            <div class="form-group">
+              <label>Url:</label>
+              <input type="text" class="form-control" name="url" required="1">
+            </div>
+            <div class="form-group">
+              <label>Tags:</label>
+              <input id='input-tag' type="text" class="form-control" name="tags" placeholder="Enter tags separated by coma" required="1">
+              <table id="add-listing-tag">
+              </table>
+            </div>
+            <div class="form-group">
+              <button class="btn btn-secondary" type="submit">Submit</button>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

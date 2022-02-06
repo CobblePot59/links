@@ -156,5 +156,11 @@ def delete(id):
     else:
         return redirect(url_for('login'))
 
+@app.route('/tags')
+def tags():
+    if session.get('status'):
+        q = Tag.query.with_entities(Tag.name).group_by(Tag.name).all()
+        return Response(dumps([ tag[0] for tag in q]), mimetype='application/json', status=200  )
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=80)
