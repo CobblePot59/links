@@ -37,11 +37,6 @@ def index():
     else:
         return redirect(url_for('login'))
 
-@app.route('/ldap')
-@ldap.login_required
-def ldap_protected():
-    return 'Success!'
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if session.get('status'):
