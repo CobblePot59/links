@@ -21,16 +21,3 @@ services:
       #- ./volumes/rp/ssl/www.links.int.key:/etc/ssl/private/www.links.int.key:ro
     environment:
       - NGINX_HOST=www.links.int
-  openldap:
-    image: bitnami/openldap:2.6
-    ports:
-      - '1389:1389'
-      - '1636:1636'
-    environment:
-      - LDAP_ROOT="dc=links,dc=int"
-      - LDAP_DOMAIN="links.int"
-      - LDAP_ADMIN_USERNAME=admin
-      - LDAP_ADMIN_PASSWORD=adminpassword
-      - LDAP_USERS=user01,user02
-      - LDAP_PASSWORDS=password1,password2
-
