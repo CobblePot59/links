@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   app:
@@ -8,7 +8,6 @@ services:
     restart: always
     volumes: 
         - ./volumes/app:/opt/links
-
   rp:
     image: nginx:alpine
     container_name: links-rp
@@ -18,12 +17,12 @@ services:
       #- "443:443"
     volumes:
       - ./volumes/rp/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
-      #- ./volumes/rp/ssl/links.cobblepot59.int.crt:/etc/ssl/certs/links.cobblepot59.int.crt:ro
-      #- ./volumes/rp/ssl/links.cobblepot59.int.key:/etc/ssl/private/links.cobblepot59.int.key:ro
+      #- ./volumes/rp/ssl/www.links.int.crt:/etc/ssl/certs/www.links.int.crt:ro
+      #- ./volumes/rp/ssl/www.links.int.key:/etc/ssl/private/www.links.int.key:ro
     environment:
-      - NGINX_HOST=links.cobblepot59.int
+      - NGINX_HOST=www.links.int
   openldap:
-    image: docker.io/bitnami/openldap:2.6
+    image: bitnami/openldap:2.6
     ports:
       - '1389:1389'
       - '1636:1636'
