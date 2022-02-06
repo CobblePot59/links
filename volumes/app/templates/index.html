@@ -142,5 +142,32 @@
       }
     }, 'json');
   }
+  
+  function addTag(tagObject){
+    name = tagObject.id.split('-')[1];
+    input = $('#input-tag');
+    if( input.val().includes(name)){
+      tagObject.lastElementChild.style.color = "";
+      input.val( () => {
+        return input.val().replace(','+name, '').replace(name+',', '').replace(name, '');
+      });
+    }else{
+      tagObject.lastElementChild.style.color = 'green';
+      input.val( () => {
+        return input.val().length > 0 ? input.val() + ',' + name : name;
+      });
+
+    }
+  }
+
+  $(document).ready(function(){
+    $.get('/tags', tags => {
+        tags.forEach( (elt, i) => {
+          if( !(i % 5) )
+            $("#add-listing-tag").append("</tr><tr>");
+          $("#add-listing-tag").append('<td id="tag-'+ elt +'" onClick="addTag(this)"><i class="bi bi-tag"></i> '+ elt+'</td>');
+        });
+    }, 'json');
+  });
 </script>
 {% endblock %}
