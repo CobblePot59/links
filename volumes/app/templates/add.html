@@ -10,11 +10,14 @@
             </div>
             <div class="form-group">
               <label>Tags:</label>
-              <input id='input-tag' type="text" class="form-control" name="tags" placeholder="Enter tags separated by coma" required="1">
-              <table id="add-listing-tag">
+              <input id='input-tag' type="text" class="form-control"  placeholder="Select a tag" required="1">
+              <p id = "datalist"></p>
+              <table id="listing-tag">
+
               </table>
             </div>
             <div class="form-group">
+              <input id="send-tag" name="tags" hidden type="text">
               <button class="btn btn-secondary" type="submit">Submit</button>
             </div>
           </form>

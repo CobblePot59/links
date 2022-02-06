@@ -162,5 +162,12 @@ def tags():
         q = Tag.query.with_entities(Tag.name).group_by(Tag.name).all()
         return Response(dumps([ tag[0] for tag in q]), mimetype='application/json', status=200  )
 
+@app.route('/tag/<name>')
+def tag(name):
+    if session.get('status'):
+        look_for = '%{0}%'.format(name)
+        q = Tag.query.with_entities(Tag.name).filter(Tag.name.like(look_for)).group_by(Tag.name).all()
+        return Response(dumps([ tag[0] for tag in q]), mimetype='application/json', status=200  )
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=80)

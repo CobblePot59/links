@@ -143,16 +143,34 @@
     }, 'json');
   }
   
+  $(document).ready(function(){
+        $("#input-tag").on("input",function(e){
+            $("#datalist").empty();
+            if($('#input-tag').val())
+              $.ajax({
+                  method:"get",
+                  url:"/tag/"+ $("#input-tag").val(),
+                  success: (res) => {
+                      var data = "<div class='list-group'>";
+                      $.each(res,function(index,value){
+                          data += "<p id='tag-"+ value +"' onClick='addTag(this)' class='list-group-item list-group-item-action'>"+value+"</p>";
+                      });
+                      data += "</div>";
+                      $("#datalist").html(data);
+                  }
+            });
+        });
+    });
+
   function addTag(tagObject){
     name = tagObject.id.split('-')[1];
-    input = $('#input-tag');
-    if( input.val().includes(name)){
-      tagObject.lastElementChild.style.color = "";
+    input = $('#send-tag');
+    if( input.val().includes(name)){$("#listing-tag")[0].innerHTML = $("#listing-tag")[0].innerHTML.replace('<tr><td><i class=\"bi bi-tag\"></i> '+ name+'</td></tr>', '')
       input.val( () => {
         return input.val().replace(','+name, '').replace(name+',', '').replace(name, '');
       });
     }else{
-      tagObject.lastElementChild.style.color = 'green';
+      $("#listing-tag").append("<tr><td><i class='bi bi-tag'></i> "+ name +"</td>");
       input.val( () => {
         return input.val().length > 0 ? input.val() + ',' + name : name;
       });
@@ -160,14 +178,5 @@
     }
   }
 
-  $(document).ready(function(){
-    $.get('/tags', tags => {
-        tags.forEach( (elt, i) => {
-          if( !(i % 5) )
-            $("#add-listing-tag").append("</tr><tr>");
-          $("#add-listing-tag").append('<td id="tag-'+ elt +'" onClick="addTag(this)"><i class="bi bi-tag"></i> '+ elt+'</td>');
-        });
-    }, 'json');
-  });
 </script>
 {% endblock %}
