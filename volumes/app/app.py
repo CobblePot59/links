@@ -6,7 +6,6 @@ from datetime import timedelta
 from json import dumps
 from conf import config
 import validators
-import sys
 
 app = Flask(__name__)
 
@@ -15,18 +14,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/links.db'
 app.config['SECRET_KEY'] = config['SECRET_KEY']
 app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=15)
 
-app.config['LDAP_OPENLDAP'] = config['LDAP_OPENLDAP']
-app.config['LDAP_SCHEMA'] = config['LDAP_SCHEMA']
-app.config['LDAP_HOST'] = config['LDAP_HOST']
-app.config['LDAP_PORT'] = config['LDAP_PORT']
-app.config['LDAP_USE_SSL'] = config['LDAP_USE_SSL']
-app.config['LDAP_BASE_DN'] = config['LDAP_BASE_DN']
-app.config['LDAP_USERNAME'] = config['LDAP_USERNAME']
-app.config['LDAP_PASSWORD'] = config['LDAP_PASSWORD']
-app.config['LDAP_USER_OBJECT_FILTER'] = config['LDAP_USER_OBJECT_FILTER']
+ldap = LDAP(app)
 
 db = SQLAlchemy(app)
-ldap = LDAP(app)
 from models import *
 
 @app.route('/', methods=('GET', 'POST'))
@@ -50,10 +40,9 @@ def login():
             q = ldap.bind_user(login, password)
             if password and q == True:
                 session['status'] = True
-                session['login'] = login.split('@')[0]
+                session['login'] = login
                 return redirect(url_for('index'))
             else:
-
                 return 'Bad Login '
 
 @app.route('/logout', methods=['GET'])
@@ -104,8 +93,8 @@ def like(id):
         elif login in q.login:
             Like.query.filter_by(link_id=id, login=login).delete()
             db.session.commit()
-        res = {"nb": len(Link.query.filter_by(id=id).first().likes), "users": [ x[0] for x in Like.query.with_entities(Like.login).filter_by(link_id=id).all()] }
-        return Response( dumps(res), mimetype='application/json', status=200 )    
+        res = {"nb": len(Link.query.filter_by(id=id).first().likes), "users": [x[0] for x in Like.query.with_entities(Like.login).filter_by(link_id=id).all()]}
+        return Response(dumps(res), mimetype='application/json', status=200)    
     else:
         return redirect(url_for('login'))
 
@@ -121,9 +110,8 @@ def dislike(id):
         elif login in q.login:
             Dislike.query.filter_by(link_id=id, login=login).delete()
             db.session.commit()
-        
-        res = {"nb": len(Link.query.filter_by(id=id).first().dislikes), "users": [ x[0] for x in Dislike.query.with_entities(Dislike.login).filter_by(link_id=id).all()] }
-        return Response( dumps(res), mimetype='application/json', status=200 )    
+        res = {"nb": len(Link.query.filter_by(id=id).first().dislikes), "users": [x[0] for x in Dislike.query.with_entities(Dislike.login).filter_by(link_id=id).all()]}
+        return Response(dumps(res), mimetype='application/json', status=200)    
     else:
         return redirect(url_for('login'))
 
@@ -144,13 +132,15 @@ def edit(id):
 @app.route('/archive/<id>')
 def archive(id):
     if session.get('status'):
-        item = Link.query.filter_by(id=id).first()
-        if item.archive:
-            item.archive = False
-            res = {"restore": True}
+        q = Link.query.filter_by(id=id).first()
+        if q.archive:
+            q.archive = False
+            res = {'restore': True}
+            flash('Link has been restored', 'success')
         else:
-            item.archive = True
-            res = {"archive": True}
+            q.archive = True
+            res = {'archive': True}
+            flash('Link has been archived', 'success')
         db.session.commit()
         return (dumps(res), 200)
     else:
