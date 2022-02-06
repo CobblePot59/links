@@ -31,10 +31,10 @@
                         {% endfor %}
                         </td>
                         <td>
-                          <a id="like-{{link.id}}"><i class="bi bi-hand-thumbs-up" style="color:green;cursor: pointer"></i></a>
-                          <a id="dislike-{{link.id}}"><i class="bi bi-hand-thumbs-down" style="color:red"></i></a>
+                          <a id="like-{{link.id}}"><i class="bi bi-hand-thumbs-up" style="color:green;cursor:pointer;"></i></a>
+                          <a id="dislike-{{link.id}}"><i class="bi bi-hand-thumbs-down" style="color:red;cursor:pointer;"></i></a>
                           <a href="#edit" data-bs-toggle="modal" data-link-id="{{link.id}}" data-link-url="{{link.url}}"><i class="bi bi-pencil-square"></i></a>
-                          <a id="archive-{{link.id}}" onclick="archive(this)"><i class="bi bi-recycle" style="color:seagreen;cursor:pointer"></i></a>
+                          <a id="archive-{{link.id}}" onclick="archive(this)"><i class="bi bi-recycle" style="color:seagreen;cursor:pointer;"></i></a>
                           <a href="#delete" data-bs-toggle="modal" data-link-id="{{link.id}}" data-link-url="{{link.url}}"><i class="bi bi-trash"></i></a></td>
                     </tr>
                     {% else %}
@@ -52,16 +52,16 @@
                                 {% set nb_like.value = nb_like.value + 1 %}
                                 {% set lovers.entities = lovers.entities + [like.login] %}
                             {% endfor %}
-                            <a id="like-{{link.id}}" onclick="like(this)" data-toggle="tooltip" data-placement="top" title="{{lovers.entities}}"><i class="bi bi-hand-thumbs-up" style="color:green;cursor: pointer"></i>{{nb_like.value}}</a>
+                            <a id="like-{{link.id}}" onclick="like(this)" data-toggle="tooltip" data-placement="top" title="{{lovers.entities}}"><i class="bi bi-hand-thumbs-up" style="color:green;cursor:pointer;"></i>{{nb_like.value}}</a>
                             {% set nb_dislike = namespace(value=0) %}
                             {% set haters = namespace(entities=[]) %}
                             {% for dislike in link.dislikes %}
                                 {% set nb_dislike.value = nb_dislike.value + 1 %}
                                 {% set haters.entities = haters.entities + [dislike.login] %}
                             {% endfor %}
-                            <a id="dislike-{{link.id}}" onclick="dislike(this)" data-toggle="tooltip" data-placement="top" title="{{haters.entities}}"><i class="bi bi-hand-thumbs-down" style="color:red"></i>{{nb_dislike.value}}</a>
+                            <a id="dislike-{{link.id}}" onclick="dislike(this)" data-toggle="tooltip" data-placement="top" title="{{haters.entities}}"><i class="bi bi-hand-thumbs-down" style="color:red;cursor:pointer;"></i>{{nb_dislike.value}}</a>
                             <a href="#edit" data-bs-toggle="modal" data-link-id="{{link.id}}" data-link-url="{{link.url}}"><i class="bi bi-pencil-square"></i></a>
-                            <a id="archive-{{link.id}}" onclick="archive(this)"><i class="bi bi-recycle" style="color:seagreen;cursor:pointer"></i></a>
+                            <a id="archive-{{link.id}}" onclick="archive(this)"><i class="bi bi-recycle" style="color:seagreen;cursor:pointer;"></i></a>
                             <a href="#delete" data-bs-toggle="modal" data-link-id="{{link.id}}" data-link-url="{{link.url}}"><i class="bi bi-trash"></i></a>
                         </td>
                     </tr>
@@ -124,9 +124,9 @@
   function dislike(dislikeObject){
     let id = dislikeObject.id.split('-')[1];
     $.get('/dislike/'+id, (data) => {
-      dislikeObject.lastChild.data = data;
+      dislikeObject.lastChild.data = data.nb;
       $("#dislike-"+id).attr("data-bs-original-title", data.users);
-    });
+    }, 'json');
   }
 
   function archive(archiveObject){
