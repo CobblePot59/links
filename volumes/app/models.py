@@ -9,9 +9,9 @@ class Link(db.Model):
     dislikes = db.relationship('Dislike', backref='link', lazy=True)
     tags = db.relationship('Tag', backref='link', lazy=True)
     type_id =  db.Column(db.Integer, db.ForeignKey('type.id'))
-    type = db.relationship('Type', backref='types_id', lazy=True)
+    type = db.relationship('Type', backref='type_id', lazy=True)
     category_id =  db.Column(db.Integer, db.ForeignKey('category.id'))
-    category = db.relationship('Category', backref='categories_id', lazy=True)
+    category = db.relationship('Category', backref='type_id', lazy=True)
 
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
