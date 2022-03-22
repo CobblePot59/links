@@ -150,6 +150,7 @@ def archive(id):
 def delete(id):
     if session.get('status'):
         Link.query.filter_by(id=id).delete()
+        Tag.query.filter_by(link_id=id).delete()
         db.session.commit()
         flash('Link has been deleted', 'danger')
         return redirect(url_for('index'))
