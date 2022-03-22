@@ -8,11 +8,13 @@ class Link(db.Model):
     likes = db.relationship('Like', backref='link', lazy=True)
     dislikes = db.relationship('Dislike', backref='link', lazy=True)
     tags = db.relationship('Tag', backref='link', lazy=True)
-    type_id =  db.Column(db.Integer, db.ForeignKey('type.id'))
-    type = db.relationship('Type', backref='type_id', lazy=True)
-    category_id =  db.Column(db.Integer, db.ForeignKey('category.id'))
-    category = db.relationship('Category', backref='type_id', lazy=True)
+    category = db.relationship('Category', backref='link', lazy=True)
 
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    link_id = db.Column(db.Integer, db.ForeignKey('link.id'))
+    
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
@@ -28,12 +30,5 @@ class Dislike(db.Model):
     login = db.Column(db.String(255), nullable=False)
     link_id = db.Column(db.Integer, db.ForeignKey('link.id'))
 
-class Type(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-
-class Category(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-
+    
 db.create_all()
