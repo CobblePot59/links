@@ -8,13 +8,40 @@
               <label>Url: </label>
               <a id="eurl" href=""></a>
             </div>
+
+            <div class="form-group">
+              <label>Categories:</label>
+              <select name="category" class="form-control" required="1">
+                <option>-- Please select an option --</option>
+              {% for category in categories %}
+                <option>{{category.name}}</option>
+              {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Types:</label>
+              <input type="text" class="form-control" name="type" list="get-type" required="1">
+              <datalist id="get-type">
+              {% for type in types %}
+                <option>{{type.name}}</option>
+              {% endfor %}
+              </datalist>
+              <i style="color:grey;font-size: x-small;">* if the category does not appear in the list, just add it</i>
+            </div>
             <div class="form-group">
               <label>Tags:</label>
-              <input type="text" class="form-control" name="tags" placeholder="Enter tags separated by coma" required="1">
+              <input type="text" class="form-control" name="tags" list="get-tag" multiple="multiple" placeholder="Enter your tags separated by commas">
+              <datalist id="get-tag">
+              {% for tag in tags %}
+                <option>{{tag.name}}</option>
+              {% endfor %}
+              </datalist>
+              <i style="color:grey;font-size: x-small;">* if the tag does not appear in the list, just add it</i>
             </div>
             <div class="form-group">
               <button class="btn btn-secondary" type="submit">Submit</button>
             </div>
+
           </form>
         </div>
         <div class="modal-footer">
