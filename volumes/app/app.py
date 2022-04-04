@@ -23,7 +23,10 @@ from models import *
 def index():
     if session.get('status'):
         links = Link.query.all()
-        return render_template('index.html', links=links)
+        categories = Category.query.with_entities(Category.name).group_by(Category.name).all()
+        types = Type.query.with_entities(Type.name).group_by(Type.name).all()
+        tags = Tag.query.with_entities(Tag.name).group_by(Tag.name).all()
+        return render_template('index.html', links=links, categories=categories, types=types, tags=tags)
     else:
         return redirect(url_for('login'))
 
@@ -53,6 +56,23 @@ def logout():
     else:
         return redirect(url_for('login'))
 
+def sdata(q):
+    str_category = request.form['category']
+    new_category = Category(name = str_category.strip().lower(), link_id = q.id)
+    db.session.add(new_category)
+
+    str_type = request.form['type']
+    new_type = Type(name = str_type.strip().lower(), link_id = q.id)
+    db.session.add(new_type)
+
+    db.session.commit()
+
+    str_tags = request.form['tags']
+    for name in str_tags.split(','):
+        new_tag = Tag(name = name.strip().lower(), link_id = q.id)
+        db.session.add(new_tag)
+        db.session.commit()    
+
 @app.route('/add', methods=['POST'])
 def add():
     if session.get('status'):
@@ -70,17 +90,26 @@ def add():
             flash('URL already registred', 'danger')
             return redirect(url_for('index'))
 
-        str_tags = request.form['tags']
         q = Link.query.filter_by(url=url).first()
-        for name in str_tags.split(','):
-            new_tag = Tag(name = name.strip().lower(), link_id = q.id)
-            db.session.add(new_tag)
-            db.session.commit()
+        sdata(q)
         flash('Link has been added', 'success')
         return redirect(url_for('index'))
     else:
         return redirect(url_for('login'))
 
+@app.route('/edit/<id>', methods=['POST'])
+def edit(id):
+    if session.get('status'):
+        Category.query.filter_by(link_id=id).delete()
+        Type.query.filter_by(link_id=id).delete()
+        Tag.query.filter_by(link_id=id).delete()
+        q = Link.query.filter_by(id=id).first()
+        sdata(q)
+        flash('Link has been modified', 'success')
+        return redirect(url_for('index'))
+    else:
+        return redirect(url_for('login'))
+    
 @app.route('/like/<id>')
 def like(id):
     if session.get('status'):
@@ -93,8 +122,8 @@ def like(id):
         elif login in q.login:
             Like.query.filter_by(link_id=id, login=login).delete()
             db.session.commit()
-        res = {"nb": len(Link.query.filter_by(id=id).first().likes), "users": [x[0] for x in Like.query.with_entities(Like.login).filter_by(link_id=id).all()]}
-        return Response(dumps(res), mimetype='application/json', status=200)    
+        res = {'nb': len(Link.query.filter_by(id=id).first().likes), 'users': [x[0] for x in Like.query.with_entities(Like.login).filter_by(link_id=id).all()]}
+        return Response(dumps(res), mimetype='application/json', status=200)
     else:
         return redirect(url_for('login'))
 
@@ -110,22 +139,8 @@ def dislike(id):
         elif login in q.login:
             Dislike.query.filter_by(link_id=id, login=login).delete()
             db.session.commit()
-        res = {"nb": len(Link.query.filter_by(id=id).first().dislikes), "users": [x[0] for x in Dislike.query.with_entities(Dislike.login).filter_by(link_id=id).all()]}
-        return Response(dumps(res), mimetype='application/json', status=200)    
-    else:
-        return redirect(url_for('login'))
-
-@app.route('/edit/<id>', methods=('GET', 'POST'))
-def edit(id):
-    if session.get('status'):
-        str_tags = request.form['tags']
-        Tag.query.filter_by(link_id=id).delete()
-        for name in str_tags.split(','):
-            new_tag = Tag(name = name.strip().lower(), link_id = id)
-            db.session.add(new_tag)
-            db.session.commit()
-        flash('Link has been modified', 'success')
-        return redirect(url_for('index'))
+        res = {'nb': len(Link.query.filter_by(id=id).first().dislikes), 'users': [x[0] for x in Dislike.query.with_entities(Dislike.login).filter_by(link_id=id).all()]}
+        return Response(dumps(res), mimetype='application/json', status=200)
     else:
         return redirect(url_for('login'))
 
@@ -136,20 +151,22 @@ def archive(id):
         if q.archive:
             q.archive = False
             res = {'restore': True}
-            flash('Link has been restored', 'success')
+            #flash('Link has been restored', 'success')
         else:
             q.archive = True
             res = {'archive': True}
-            flash('Link has been archived', 'success')
+            #flash('Link has been archived', 'success')
         db.session.commit()
-        return (dumps(res), 200)
+        return Response(dumps(res), mimetype='application/json', status=200)
     else:
         return redirect(url_for('login'))
-        
-@app.route('/delete/<id>', methods=('GET', 'POST'))
+
+@app.route('/delete/<id>', methods=['POST'])
 def delete(id):
     if session.get('status'):
         Link.query.filter_by(id=id).delete()
+        Category.query.filter_by(link_id=id).delete()
+        Type.query.filter_by(link_id=id).delete()
         Tag.query.filter_by(link_id=id).delete()
         db.session.commit()
         flash('Link has been deleted', 'danger')
@@ -157,18 +174,6 @@ def delete(id):
     else:
         return redirect(url_for('login'))
 
-@app.route('/tags')
-def tags():
-    if session.get('status'):
-        q = Tag.query.with_entities(Tag.name).group_by(Tag.name).all()
-        return Response(dumps([ tag[0] for tag in q]), mimetype='application/json', status=200  )
-
-@app.route('/tag/<name>')
-def tag(name):
-    if session.get('status'):
-        look_for = '%{0}%'.format(name)
-        q = Tag.query.with_entities(Tag.name).filter(Tag.name.like(look_for)).group_by(Tag.name).all()
-        return Response(dumps([ tag[0] for tag in q]), mimetype='application/json', status=200  )
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=80)
+    app.run(host='0.0.0.0', port=80)
