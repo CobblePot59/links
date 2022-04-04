@@ -4,10 +4,10 @@
     $("#data").DataTable({
       columns: [
         {orderable: false, searchable: true, "width": "50%"},
-        {orderable: true, searchable: true, "width": "10%"},
-        {orderable: false, searchable: true, "width": "15%"},
-        {orderable: false, searchable: true, "width": "15%"},
-        {orderable: false, searchable: false, "width": "10%"},
+        {orderable: true, searchable: true, "width": "5%"},
+        {orderable: false, searchable: true, "width": "10%"},
+        {orderable: false, searchable: true, "width": "20%"},
+        {orderable: false, searchable: false, "width": "15%"},
         ],
     });
   });
