@@ -2,7 +2,7 @@ version: "3"
 
 services:
   app:
-    build: BUILD
+    build: BUILD/app/
     image: links
     container_name: links
     restart: always
@@ -21,15 +21,19 @@ services:
       #- ./volumes/rp/ssl/www.links.int.key:/etc/ssl/private/www.links.int.key:ro
     environment:
       - NGINX_HOST=www.links.int
-  openldap:
-    image: bitnami/openldap:2.6
+  ldap:
+    build: 
+      dockerfile: BUILD/ldap/Dockerfile
+      args:
+        - SAMBA_VERSION="4.15.5"
+    image: ldap
+    container_name: ldap
+    restart: always
     ports:
-      - '1389:1389'
-      - '1636:1636'
+      - "389:389"
+      - "636:636"
     environment:
-      - LDAP_ROOT="dc=links,dc=int"
-      - LDAP_DOMAIN="links.int"
-      - LDAP_ADMIN_USERNAME=admin
-      - LDAP_ADMIN_PASSWORD=adminpassword
-      - LDAP_USERS=user01,user02
-      - LDAP_PASSWORDS=password1,password2
+      - SAMBA_DC_REALM=links.int
+      - SAMBA_DC_DOMAIN=links
+      - SAMBA_DC_ADMIN_PASSWD=Password1
+      - SAMBA_DC_DNS_BACKEND=SAMBA_INTERNAL
