@@ -23,7 +23,7 @@ services:
       - NGINX_HOST=www.links.int
   ldap:
     build: 
-      dockerfile: BUILD/ldap/Dockerfile
+      context: BUILD/ldap/
       args:
         - SAMBA_VERSION="4.15.5"
     image: ldap
