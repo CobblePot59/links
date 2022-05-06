@@ -25,7 +25,7 @@ RUN apt autoremove && apt clean && apt autoclean && \
 
 ENV PATH=/usr/local/samba/bin:/usr/local/samba/sbin:$PATH
 
-COPY --chmod=700 BUILD/ldap/docker-entrypoint.sh /docker-entrypoint.sh
+COPY --chmod=700 docker-entrypoint.sh /docker-entrypoint.sh
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["samba"]
