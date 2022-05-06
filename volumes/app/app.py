@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, flash, redirect, url_for, ses
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 from flask_simpleldap import LDAP
-from datetime import timedelta
 from json import dumps
 import validators
 
