@@ -4,7 +4,6 @@ from sqlalchemy.exc import IntegrityError
 from flask_simpleldap import LDAP
 from datetime import timedelta
 from json import dumps
-from conf import config
 import validators
 
 app = Flask(__name__)
