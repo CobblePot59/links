@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 SECRET_KEY = "xy7gof9O0a7a0I3004ro70bwOlc40slkIlict16oO2rk1go2z04tOynf2lp73oOa"
 PERMANENT_SESSION_LIFETIME =  timedelta(minutes=15)
 
