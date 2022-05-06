@@ -14,6 +14,8 @@ then
         --option="allow dns updates = disabled"
 fi
 
+sed "/idmap_ldb:use rfc2307 = yes/a ldap server require strong auth = no" -i /etc/samba/smb.conf
+
 if [ "$1" = 'samba' ]
 then
     exec samba -i < /dev/null
