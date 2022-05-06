@@ -27,7 +27,7 @@ services:
       args:
         - SAMBA_VERSION=4.15.5
     image: ldap
-    container_name: ldap
+    container_name: links-ldap
     restart: always
     ports:
       - "389:389"
