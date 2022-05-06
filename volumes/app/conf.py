@@ -7,7 +7,8 @@ LDAP_SCHEMA = "ldap"
 LDAP_HOST = "ldap"
 LDAP_PORT = "389"
 LDAP_USE_SSL = False
-LDAP_BASE_DN =  "cn=users,dc=links,dc=int"
+LDAP_DOMAIN = "links.int"
+LDAP_BASE_DN = "cn=users,dc=links,dc=int"
 LDAP_USERNAME = "cn=Administrator,dc=links,dc=int"
 LDAP_PASSWORD = "Password1"
 
