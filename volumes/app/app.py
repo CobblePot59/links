@@ -8,11 +8,7 @@ from conf import config
 import validators
 
 app = Flask(__name__)
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/links.db'
-app.config['SECRET_KEY'] = config['SECRET_KEY']
-app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=15)
+app.config.from_pyfile('conf.py')
 
 ldap = LDAP(app)
 
