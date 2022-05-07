@@ -5,7 +5,7 @@ EXPOSE 53 53/udp 88 88/udp 135 139 389 389/udp 445 464 464/udp 636 3268 3269
 ARG SAMBA_VERSION
 
 RUN DEP_PKG="python3 python3-dev python3-cryptography python3-pyasn1 \
-             python3-dateutil python3-markdown python3-dnspython\
+             python3-dateutil python3-markdown python3-dnspython python3-setproctitle\
              wget gcc make pkg-config flex bison libpopt-dev \
              libgnutls28-dev libgpgme-dev libparse-yapp-perl \
              libjansson-dev libfam-dev libarchive-dev liblmdb-dev \
