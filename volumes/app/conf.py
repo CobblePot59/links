@@ -8,8 +8,8 @@ LDAP_HOST = "ldap"
 LDAP_PORT = "389"
 LDAP_USE_SSL = False
 LDAP_DOMAIN = "links.int"
-LDAP_BASE_DN = "cn=users,dc=links,dc=int"
-LDAP_USERNAME = "cn=Administrator,dc=links,dc=int"
+LDAP_BASE_DN = "ou=Domain Users,dc=links,dc=int"
+LDAP_USERNAME = "cn=connector,ou=Services,dc=links,dc=int"
 LDAP_PASSWORD = "Password1"
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
