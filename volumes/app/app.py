@@ -32,12 +32,12 @@ def login():
         if request.method == 'GET':
             return render_template('login.html')
         else:
-            login = request.form['login']+'@'+app.config['LDAP_DOMAIN']
+            login = request.form['login']
             password = request.form['password']
-            q = ldap.bind_user(login, password)
+            q = ldap.bind_user(login+'@'+app.config['LDAP_DOMAIN'], password)
             if password and q == True:
                 session['status'] = True
-                session['login'] = login.split('@')[0]
+                session['login'] = login
                 return redirect(url_for('index'))
             else:
                 return 'Bad Login '
