@@ -12,6 +12,7 @@
                 <table id="data" class="table table-striped">
                     <thead>
                         <tr>
+			    <th>#</th>
                             <th>Urls</th>
                             <th>Categories</th>
                             <th>Types</th>
@@ -22,6 +23,7 @@
                     <tbody>
                     {% for link in links %}
                     <tr id="row-{{link.id}}">
+			<th scope="row">{{link.id}}</th>
                         <td>
                           {% if link.archive %}
                             <a style="color:grey; text-decoration:line-through; pointer-events:none;" href="{{link.url}}">{{link.url}}</a>
