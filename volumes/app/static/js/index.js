@@ -2,12 +2,14 @@
     $('[data-toggle="tooltip"]').tooltip();
 
     $("#data").DataTable({
+      order: [[0, 'desc']],
       columns: [
+        {orderable: true, searchable: false, "width": "1%"},
         {orderable: false, searchable: true, "width": "50%"},
         {orderable: true, searchable: true, "width": "5%"},
         {orderable: false, searchable: true, "width": "10%"},
         {orderable: false, searchable: true, "width": "20%"},
-        {orderable: false, searchable: false, "width": "15%"},
+        {orderable: false, searchable: false, "width": "14%"},
         ],
     });
   });
