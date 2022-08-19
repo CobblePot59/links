@@ -1,8 +1,7 @@
-from flask import Flask, render_template, request, flash, redirect, url_for, session, Response
+from flask import Flask, render_template, request, flash, redirect, url_for, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 from flask_simpleldap import LDAP
-from json import dumps
 import validators
 
 app = Flask(__name__)
@@ -117,7 +116,7 @@ def like(id):
             Like.query.filter_by(link_id=id, login=login).delete()
             db.session.commit()
         res = {'nb': len(Link.query.filter_by(id=id).first().likes), 'users': [x[0] for x in Like.query.with_entities(Like.login).filter_by(link_id=id).all()]}
-        return Response(dumps(res), mimetype='application/json', status=200)
+        return jsonify(res)
     else:
         return redirect(url_for('login'))
 
@@ -134,7 +133,7 @@ def dislike(id):
             Dislike.query.filter_by(link_id=id, login=login).delete()
             db.session.commit()
         res = {'nb': len(Link.query.filter_by(id=id).first().dislikes), 'users': [x[0] for x in Dislike.query.with_entities(Dislike.login).filter_by(link_id=id).all()]}
-        return Response(dumps(res), mimetype='application/json', status=200)
+        return jsonify(res)
     else:
         return redirect(url_for('login'))
 
@@ -151,7 +150,7 @@ def archive(id):
             res = {'archive': True}
             #flash('Link has been archived', 'success')
         db.session.commit()
-        return Response(dumps(res), mimetype='application/json', status=200)
+        return jsonify(res)
     else:
         return redirect(url_for('login'))
 
