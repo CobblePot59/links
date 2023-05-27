@@ -1,4 +1,4 @@
-from app import db
+from app import app,db
 
 
 class Link(db.Model):
@@ -36,7 +36,8 @@ class Tag(db.Model):
     name = db.Column(db.String(255))
     link_id = db.Column(db.Integer, db.ForeignKey('link.id'))
 
-db.create_all()
+with app.app_context():
+    db.create_all()
 
 '''
 # Insert Categories

@@ -1,9 +1,11 @@
 FROM python:slim-buster
+
 WORKDIR /opt/links
+
 RUN apt update -y && \
-    apt install -y gcc libsasl2-dev libldap2-dev && \
-	python3 -m pip install gunicorn flask flask-sqlalchemy==2.5.1 flask_simpleldap validators
-ENV GUNICORN_CMD_ARGS="--bind=0.0.0.0:80 --workers=4"
+    apt-get install -y --no-install-recommends gcc libsasl2-dev libldap2-dev && \
+    python3 -m pip install --no-cache-dir gunicorn flask flask-sqlalchemy flask-ldap3-login validators
+
 EXPOSE 80
-ENTRYPOINT ["python3"]
-CMD ["-m", "gunicorn","wsgi:app"]
+
+CMD ["gunicorn", "wsgi:app", "--bind=0.0.0.0:80", "--workers=4", "--reload"]

@@ -6,7 +6,7 @@ services:
     image: links
     container_name: links
     restart: always
-    volumes: 
+    volumes:
         - ./volumes/app:/opt/links
   rp:
     image: nginx:alpine
