@@ -8,7 +8,6 @@ app.config.from_pyfile('config.py')
 ldap = LDAP3LoginManager(app)
 
 db = SQLAlchemy(app)
-from models import *
 
 from views import *
 
