@@ -1,7 +1,7 @@
 from flask import render_template, request, flash, redirect, url_for, session, jsonify
 from sqlalchemy.exc import IntegrityError
 from app import app, ldap, db
-from app import Link, Like, Dislike, Category, Type, Tag
+from models import *
 from decor import login_required
 import validators
 
