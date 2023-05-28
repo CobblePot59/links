@@ -58,7 +58,7 @@ def insert_data():
     
 with app.app_context():
     db.create_all()
-    try:
-        insert_data()
-    except IntegrityError:
-        pass
+#     try:
+#         insert_data()
+#     except IntegrityError:
+#         pass
