@@ -36,24 +36,29 @@ class Tag(db.Model):
     name = db.Column(db.String(255))
     link_id = db.Column(db.Integer, db.ForeignKey('link.id'))
 
+    
+def insert_data():
+    # Insert Categories
+    categories = ['tools', 'courses']
+    for category in categories:
+        db.session.add(Category(name=category))
+
+    # Insert Types
+    types = ['network', 'blue', 'red', 'purple','dev', 'system','online', 'others', 'devops']
+    for type in types:
+        db.session.add(Type(name=type))
+
+    # Insert Tags
+    tags = ['mitm', 'dos', 'web', 'exploit', 'privesc', 'lateral', 'se', 'forensics', 'osint', 'ctf', 'reverse', 'iot', 'isc','python', 'windows', 'android', 'linux', 'ios', 'docker', 'password']
+    for tag in tags:
+        db.session.add(Tag(name=tag))
+
+    db.session.commit()
+
+    
 with app.app_context():
     db.create_all()
-
-'''
-# Insert Categories
-names = ['tools', 'courses']
-for name in names:
-    db.session.add(Category(name=name))
-
-# Insert Types
-names = ['network', 'blue', 'red', 'purple','dev', 'system','online', 'others', 'devops']
-for name in names:
-    db.session.add(Type(name=name))
-
-# Insert Tags
-names = ['mitm', 'dos', 'web', 'exploit', 'privesc', 'lateral', 'se', 'forensics', 'osint', 'ctf', 'reverse', 'iot', 'isc','python', 'windows', 'android', 'linux', 'ios', 'docker', 'password']
-for name in names:
-    db.session.add(Tag(name=name))
-
-db.session.commit()
-'''
+    try:
+        insert_data()
+    except IntegrityError:
+        pass
