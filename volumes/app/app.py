@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_ldap3_login import LDAP3LoginManager
+from flask_toastr import Toastr
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
