@@ -28,7 +28,7 @@ def login():
         session.update({'status':True, 'login':login})
         return redirect(url_for('index'))
     else:
-        flash('Bad login', 'danger')
+        flash('Bad login', 'error')
         return redirect(url_for('login'))
 
 @app.route('/logout', methods=['GET'])
@@ -59,7 +59,7 @@ def add():
     url = request.form['url']
 
     if not validators.url(url):
-        flash('A valid URL is required!', 'danger')
+        flash('A valid URL is required!', 'error')
         return redirect(url_for('index'))
 
     try:
@@ -67,7 +67,7 @@ def add():
         db.session.add(new_link)
         db.session.commit()
     except IntegrityError:
-        flash('URL already registred', 'danger')
+        flash('URL already registred', 'error')
         return redirect(url_for('index'))
 
     q = Link.query.filter_by(url=url).first()
@@ -139,5 +139,5 @@ def delete(id):
     Type.query.filter_by(link_id=id).delete()
     Tag.query.filter_by(link_id=id).delete()
     db.session.commit()
-    flash('Link has been deleted', 'danger')
+    flash('Link has been deleted', 'error')
     return redirect(url_for('index'))
