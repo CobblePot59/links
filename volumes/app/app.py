@@ -9,6 +9,8 @@ ldap = LDAP3LoginManager(app)
 
 db = SQLAlchemy(app)
 
+toastr = Toastr(app)
+
 from views import *
 
 if __name__ == '__main__':
